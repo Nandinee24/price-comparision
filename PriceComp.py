@@ -4,22 +4,32 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-from webdriver_manager.chrome import ChromeDriverManager
 
-source1 = 'https://www.flipkart.com/apple-iphone-14-plus-blue-128-gb/p/itmac8385391b02b?pid=MOBGHWFHUYWGB5F2'
-source2 = 'https://www.amazon.in/dp/B0BDK62STN'
-source3 = "https://www.croma.com/apple-iphone-14-plus-128gb-blue-/p/261949"
+# Path to the downloaded ChromeDriver
+chrome_driver_path = r"C:\Users\vekar\Downloads\chromedriver-win64\chromedriver-win64\chromedriver.exe"
 
-# Create a webdriver object for Chrome-options and configure
-wait_imp = 10
-CO = webdriver.ChromeOptions()
-CO.add_experimental_option('useAutomationExtension', False)
-CO.add_argument('--ignore-certificate-errors')
-CO.add_argument('--start-maximized')
+# Function to initialize the webdriver
+def initialize_webdriver():
+    try:
+        # Ensure correct installation of ChromeDriver
+        service = ChromeService(executable_path=chrome_driver_path)
+        options = webdriver.ChromeOptions()
+        options.add_experimental_option('useAutomationExtension', False)
+        options.add_argument('--ignore-certificate-errors')
+        options.add_argument('--start-maximized')
+        driver = webdriver.Chrome(service=service, options=options)
+        return driver
+    except Exception as e:
+        print(f"Error initializing WebDriver: {e}")
+        exit(1)
+
+# Prompt the user to enter URLs
+source1 = input("Enter the Flipkart URL: ")
+source2 = input("Enter the Amazon URL: ")
+source3 = input("Enter the Croma URL: ")
 
 # Initialize the Chrome driver
-service = ChromeService(ChromeDriverManager().install())
-wd = webdriver.Chrome(service=service, options=CO)
+wd = initialize_webdriver()
 
 print("*************************************************************************** \n")
 print("                     Starting Program, Please wait ..... \n")
@@ -33,11 +43,11 @@ raw_c = "Not available"
 print("Connecting to Flipkart")
 wd.get(source1)
 try:
-    f_price = WebDriverWait(wd, wait_imp).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="container"]/div/div[3]/div[1]/div[2]/div[3]/div/div[4]/div[1]/div/div[1]'))
+    f_price = WebDriverWait(wd, 10).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[4]/div[1]/div/div[1]'))
     )
-    pr_name = WebDriverWait(wd, wait_imp).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="container"]/div/div[3]/div[1]/div[2]/div[3]/div/div[1]/h1/span'))
+    pr_name = WebDriverWait(wd, 10).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="container"]/div/div[3]/div[1]/div[2]/div[2]/div/div[1]/h1/span'))
     )
     product = pr_name.text
     r_price = f_price.text
@@ -51,11 +61,11 @@ time.sleep(2)
 print("Connecting to Amazon")
 wd.get(source2)
 try:
-    a_price = WebDriverWait(wd, wait_imp).until(
-        EC.presence_of_element_located((By.XPATH, '//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]/span[3]/span[2]/span[2]' ))
+    a_price = WebDriverWait(wd, 10).until(
+        EC.presence_of_element_located((By.XPATH, '//*[@id="corePriceDisplay_desktop_feature_div"]/div[1]/span[3]/span[2]/span[2]'))
     )
     raw_p = a_price.text
-    pr_name_amazon = WebDriverWait(wd, wait_imp).until(
+    pr_name_amazon = WebDriverWait(wd, 10).until(
         EC.presence_of_element_located((By.XPATH, '//*[@id="productTitle"]'))
     )
     product_amazon = pr_name_amazon.text
@@ -71,7 +81,7 @@ time.sleep(2)
 print("Connecting to Croma")
 wd.get(source3)
 try:
-    c_price = WebDriverWait(wd, wait_imp).until(
+    c_price = WebDriverWait(wd, 10).until(
         EC.presence_of_element_located((By.XPATH, "//span[@class='amount']"))
     )
     raw_c = c_price.text
